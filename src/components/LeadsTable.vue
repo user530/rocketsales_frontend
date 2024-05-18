@@ -1,7 +1,9 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { IColumn, ILead, ILeadContact } from '../types';
+import { ILead } from '../types';
 import ContactsTable from './ContactsTable.vue';
+import { charToColor } from '../utils';
+import type { TableColumnType } from 'ant-design-vue/es';
 
 export default defineComponent({
     name: 'LeadsTable',
@@ -15,7 +17,6 @@ export default defineComponent({
         // Placeholder data
         leadsData.value = [
             {
-                "key": 1,
                 "name": "Сделка№1",
                 "price": 100,
                 "created_at": 1715775952,
@@ -29,8 +30,9 @@ export default defineComponent({
                 "contacts": [
                     {
                         "name": "Василий Пупкин",
-                        "phone": "Должность1",
-                        "email": "Почта1"
+                        "phone": "Телефон1",
+                        "email": "Почта1",
+                        "position": "Должность1"
                     },
                     {
                         "name": "Пётр",
@@ -40,7 +42,6 @@ export default defineComponent({
                 ]
             },
             {
-                "key": 2,
                 "name": "Сделка3",
                 "price": 300,
                 "created_at": 1715776192,
@@ -54,13 +55,13 @@ export default defineComponent({
                 "contacts": [
                     {
                         "name": "Василий Пупкин",
-                        "phone": "Должность1",
-                        "email": "Почта1"
+                        "phone": "Телефон1",
+                        "email": "Почта1",
+                        "position": "Должность1"
                     }
                 ]
             },
             {
-                "key": 3,
                 "name": "Сделка5",
                 "price": 500,
                 "created_at": 1715776345,
@@ -73,9 +74,215 @@ export default defineComponent({
                 },
                 "contacts": []
             },
-        ]
+            {
+                "name": "Сделка9",
+                "price": 900,
+                "created_at": 1715776511,
+                "status": {
+                    "name": "Переговоры",
+                    "color": "#ffff99"
+                },
+                "responsible": {
+                    "name": "Magomed"
+                },
+                "contacts": [
+                    {
+                        "name": "Василий Пупкин",
+                        "phone": "Телефон1",
+                        "email": "Почта1",
+                        "position": "Должность1"
+                    }
+                ]
+            },
+            {
+                "name": "Номер2",
+                "price": 200,
+                "created_at": 1715776154,
+                "status": {
+                    "name": "Первичный контакт",
+                    "color": "#99ccff"
+                },
+                "responsible": {
+                    "name": "Magomed"
+                },
+                "contacts": [
+                    {
+                        "name": "Пелагея Шувалова",
+                        "phone": "Телефон2",
+                        "position": "Должность2"
+                    }
+                ]
+            },
+            {
+                "name": "Сделка6",
+                "price": 600,
+                "created_at": 1715776413,
+                "status": {
+                    "name": "Первичный контакт",
+                    "color": "#99ccff"
+                },
+                "responsible": {
+                    "name": "Magomed"
+                },
+                "contacts": []
+            },
+            {
+                "name": "Сделка7",
+                "price": 700,
+                "created_at": 1715776446,
+                "status": {
+                    "name": "Переговоры",
+                    "color": "#ffff99"
+                },
+                "responsible": {
+                    "name": "Magomed"
+                },
+                "contacts": [
+                    {
+                        "name": "Яков Королёв",
+                        "phone": "Телефон4",
+                        "email": "Почта4"
+                    }
+                ]
+            },
+            {
+                "name": "Сделка8",
+                "price": 800,
+                "created_at": 1715776484,
+                "status": {
+                    "name": "Принимают решение",
+                    "color": "#ffcc66"
+                },
+                "responsible": {
+                    "name": "Magomed"
+                },
+                "contacts": [
+                    {
+                        "name": "Светлана Камалова"
+                    }
+                ]
+            },
+            {
+                "name": "Сделка4",
+                "price": 400,
+                "created_at": 1715776218,
+                "status": {
+                    "name": "Согласование договора",
+                    "color": "#ffcccc"
+                },
+                "responsible": {
+                    "name": "Magomed"
+                },
+                "contacts": [
+                    {
+                        "name": "Марьяна Кайназарова",
+                        "phone": "Телефон4",
+                        "email": "Почта4"
+                    },
+                    {
+                        "name": "Василий Пупкин",
+                        "phone": "Телефон1",
+                        "email": "Почта1",
+                        "position": "Должность1"
+                    },
+                    {
+                        "name": "Пётр",
+                        "phone": "Телефон5",
+                        "email": "Почта5"
+                    }
+                ]
+            },
+            {
+                "name": "Сделка10",
+                "price": 1000,
+                "created_at": 1715776538,
+                "status": {
+                    "name": "Первичный контакт",
+                    "color": "#99ccff"
+                },
+                "responsible": {
+                    "name": "Magomed"
+                },
+                "contacts": [
+                    {
+                        "name": "Михаил Калашников",
+                        "email": "Почта2",
+                        "position": "Должность3"
+                    }
+                ]
+            },
+            {
+                "name": "Тестовая21",
+                "price": 250,
+                "created_at": 1715959844,
+                "status": {
+                    "name": "Первичный контакт",
+                    "color": "#99ccff"
+                },
+                "responsible": {
+                    "name": "Magomed"
+                },
+                "contacts": [
+                    {
+                        "name": "Павел",
+                        "email": "Почта21"
+                    }
+                ]
+            },
+            {
+                "name": "тестовая23",
+                "price": 300,
+                "created_at": 1715959932,
+                "status": {
+                    "name": "Переговоры",
+                    "color": "#ffff99"
+                },
+                "responsible": {
+                    "name": "Magomed"
+                },
+                "contacts": [
+                    {
+                        "name": "Алёша Попович",
+                        "phone": "телефон23",
+                        "email": "почта23"
+                    }
+                ]
+            },
+            {
+                "name": "Тестова22",
+                "price": 0,
+                "created_at": 1715959874,
+                "status": {
+                    "name": "Принимают решение",
+                    "color": "#ffcc66"
+                },
+                "responsible": {
+                    "name": "Magomed"
+                },
+                "contacts": [
+                    {
+                        "name": "",
+                        "phone": "телефон22",
+                        "email": "почта22"
+                    }
+                ]
+            },
+            {
+                "name": "Сделка #2892909",
+                "price": 0,
+                "created_at": 1715959948,
+                "status": {
+                    "name": "Первичный контакт",
+                    "color": "#99ccff"
+                },
+                "responsible": {
+                    "name": "Magomed"
+                },
+                "contacts": []
+            }
+        ].map((val, ind) => ({ ...val, key: ind }));
 
-        const columns: IColumn[] = [
+        const columns: TableColumnType<ILead>[] = [
             {
                 title: 'Название',
                 dataIndex: 'name',
@@ -108,6 +315,7 @@ export default defineComponent({
             columns,
             loading,
             leadsData,
+            charToColor,
         };
     }
 });
@@ -115,16 +323,37 @@ export default defineComponent({
 
 <template>
     <a-spin :spinning="loading">
-        <a-table :columns="columns" :dataSource="leadsData">
-            <!-- Expand column setup -->
+        <a-table :columns="columns" :dataSource="leadsData" :expandRowByClick=true tableLayout="fixed">
             <template #expandedRowRender="{ record }: { record: ILead }">
                 <ContactsTable :contacts="record.contacts" />
             </template>
 
-            <!-- Expand column title -->
-            <template #expandColumnTitle>
-                <span style="color:red">Контакты</span>
+            <template #bodyCell="{ column, record }: { column: TableColumnType, record: ILead }">
+                <!-- Status column -->
+                <template v-if="column.key === 'status'">
+                    <a-tag :color="record.status.color" class="custom-tag-text-color">{{ record.status.name }}</a-tag>
+                </template>
+
+                <!-- Responsible column -->
+                <template v-if="column.key === 'responsible'">
+                    <a-avatar
+                        :style="{ 'background-color': charToColor(record.responsible.name ? record.responsible.name : '?') }">
+                        {{ record.responsible.name ? record.responsible.name[0] : '?' }}
+                    </a-avatar>
+                    {{ record.responsible.name }}
+                </template>
+
+                <!-- Created At column -->
+                <template v-if="column.key === 'created_at'">
+                    {{ new Date(record.created_at).toLocaleString() }}
+                </template>
             </template>
         </a-table>
     </a-spin>
 </template>
+
+<style scoped>
+:deep .custom-tag-text-color {
+    color: #666 !important;
+}
+</style>
