@@ -1,38 +1,15 @@
 <template>
-  <a-spin :spinning="loading">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
-  </a-spin>
+  <LeadsTable />
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
+import { defineComponent } from 'vue';
+import { LeadsTable } from './components';
 
 export default defineComponent({
   name: 'App',
   components: {
-    HelloWorld
+    LeadsTable,
   },
-  setup() {
-    const loading = ref(true);
-
-    setTimeout(() => loading.value = false, 3000);
-
-    return {
-      loading,
-    }
-  }
 });
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
