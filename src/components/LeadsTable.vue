@@ -1,16 +1,21 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { IColumn, ILead } from '../types';
+import { IColumn, ILead, ILeadContact } from '../types';
+import ContactsTable from './ContactsTable.vue';
 
 export default defineComponent({
     name: 'LeadsTable',
+    components: {
+        ContactsTable,
+    },
     setup() {
-        const leadsData = ref<ILead[]>([]);
+        const leadsData = ref<(ILead & { key: number })[]>([]);
         const loading = ref(false);
 
         // Placeholder data
         leadsData.value = [
             {
+                "key": 1,
                 "name": "Сделка№1",
                 "price": 100,
                 "created_at": 1715775952,
@@ -35,6 +40,7 @@ export default defineComponent({
                 ]
             },
             {
+                "key": 2,
                 "name": "Сделка3",
                 "price": 300,
                 "created_at": 1715776192,
@@ -54,6 +60,7 @@ export default defineComponent({
                 ]
             },
             {
+                "key": 3,
                 "name": "Сделка5",
                 "price": 500,
                 "created_at": 1715776345,
@@ -68,7 +75,7 @@ export default defineComponent({
             },
         ]
 
-        const leadsColumns: IColumn[] = [
+        const columns: IColumn[] = [
             {
                 title: 'Название',
                 dataIndex: 'name',
@@ -97,32 +104,8 @@ export default defineComponent({
             },
         ];
 
-        const contactsColumns: IColumn[] = [
-            {
-                title: 'Имя контакта',
-                dataIndex: 'name',
-                key: 'name'
-            },
-            {
-                title: 'Должность',
-                dataIndex: 'position',
-                key: 'position'
-            },
-            {
-                title: 'Почтовый адрес',
-                dataIndex: 'email',
-                key: 'email'
-            },
-            {
-                title: 'Телефон',
-                dataIndex: 'phone',
-                key: 'phone'
-            },
-        ]
-
         return {
-            leadsColumns,
-            contactsColumns,
+            columns,
             loading,
             leadsData,
         };
@@ -132,13 +115,12 @@ export default defineComponent({
 
 <template>
     <a-spin :spinning="loading">
-        <a-table :columns="leadsColumns" :dataSource="leadsData">
+        <a-table :columns="columns" :dataSource="leadsData">
             <!-- Expand column setup -->
-            <template #expandedRowRender="{ record }">
-                <a-table :columns="contactsColumns" :dataSource="record.contacts">
-
-                </a-table>
+            <template #expandedRowRender="{ record }: { record: ILead }">
+                <ContactsTable :contacts="record.contacts" />
             </template>
+
             <!-- Expand column title -->
             <template #expandColumnTitle>
                 <span style="color:red">Контакты</span>
