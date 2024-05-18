@@ -1,5 +1,7 @@
 <template>
-  <LeadsTable />
+  <main class="main-content">
+    <LeadsTable />
+  </main>
 </template>
 
 <script lang="ts">
@@ -13,3 +15,11 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.main-content {
+  padding: 2rem 1rem;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+}
+</style>
