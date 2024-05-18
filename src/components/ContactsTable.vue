@@ -56,8 +56,8 @@ export default defineComponent({
 </script>
 
 <template>
-    <a-table rowClassName="test" :columns="columns" :dataSource="contacts" :pagination=false :showHeader=false
-        tableLayout="fixed">
+    <a-table rowClassName="custom-darker-row" :columns="columns" :dataSource="contacts" :pagination=false
+        :showHeader=false tableLayout="fixed">
         <template #bodyCell="{ column, record }: { column: TableColumnType, record: ILeadContact }">
             <!-- Avatar column -->
             <template v-if="column.key === 'icon'">
@@ -91,11 +91,11 @@ export default defineComponent({
 </template>
 
 <style scoped>
-:deep .test td {
+:deep .custom-darker-row td {
     background-color: #fafafa;
 }
 
-:deep .test:hover td {
+:deep .custom-darker-row:hover td {
     background-color: #efefef !important;
 }
 </style>

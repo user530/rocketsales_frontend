@@ -2,13 +2,15 @@
 import { defineComponent, ref } from 'vue';
 import { ILead } from '../types';
 import ContactsTable from './ContactsTable.vue';
-import { charToColor } from '../utils';
+import { charToColor, unixTimeToString } from '../utils';
 import type { TableColumnType } from 'ant-design-vue/es';
+import { UserOutlined } from '@ant-design/icons-vue';
 
 export default defineComponent({
     name: 'LeadsTable',
     components: {
         ContactsTable,
+        UserOutlined,
     },
     setup() {
         const leadsData = ref<(ILead & { key: number })[]>([]);
@@ -316,44 +318,54 @@ export default defineComponent({
             loading,
             leadsData,
             charToColor,
+            unixTimeToString,
         };
     }
 });
 </script>
 
 <template>
-    <a-spin :spinning="loading">
-        <a-table :columns="columns" :dataSource="leadsData" :expandRowByClick=true tableLayout="fixed">
-            <template #expandedRowRender="{ record }: { record: ILead }">
-                <ContactsTable :contacts="record.contacts" />
-            </template>
-
-            <template #bodyCell="{ column, record }: { column: TableColumnType, record: ILead }">
-                <!-- Status column -->
-                <template v-if="column.key === 'status'">
-                    <a-tag :color="record.status.color" class="custom-tag-text-color">{{ record.status.name }}</a-tag>
+    <a-card title="Пример тестового задания">
+        <a-spin :spinning="loading">
+            <a-table :customHeaderRow="() => ({ class: 'custom-header' })" :columns="columns" :dataSource="leadsData"
+                expandRowByClick tableLayout="fixed" sticky>
+                <template #expandedRowRender="{ record }: { record: ILead }">
+                    <ContactsTable :contacts="record.contacts" />
                 </template>
 
-                <!-- Responsible column -->
-                <template v-if="column.key === 'responsible'">
-                    <a-avatar
-                        :style="{ 'background-color': charToColor(record.responsible.name ? record.responsible.name : '?') }">
-                        {{ record.responsible.name ? record.responsible.name[0] : '?' }}
-                    </a-avatar>
-                    {{ record.responsible.name }}
-                </template>
+                <template #bodyCell="{ column, record }: { column: TableColumnType, record: ILead }">
+                    <!-- Status column -->
+                    <template v-if="column.key === 'status'">
+                        <a-tag :color="record.status.color" class="custom-tag-text-color">{{ record.status.name
+                            }}</a-tag>
+                    </template>
 
-                <!-- Created At column -->
-                <template v-if="column.key === 'created_at'">
-                    {{ new Date(record.created_at).toLocaleString() }}
+                    <!-- Responsible column -->
+                    <template v-if="column.key === 'responsible'">
+                        <a-avatar
+                            :style="{ 'background-color': charToColor(record.responsible.name ? record.responsible.name : '?'), 'color': '#666' }">
+                            <user-outlined />
+                        </a-avatar>
+                        {{ record.responsible.name }}
+                    </template>
+
+                    <!-- Created At column -->
+                    <template v-if="column.key === 'created_at'">
+                        <!-- Unix time to JS time and then to string of requested format -->
+                        {{ unixTimeToString(record.created_at) }}
+                    </template>
                 </template>
-            </template>
-        </a-table>
-    </a-spin>
+            </a-table>
+        </a-spin>
+    </a-card>
 </template>
 
 <style scoped>
 :deep .custom-tag-text-color {
     color: #666 !important;
+}
+
+:deep .custom-header th {
+    background-color: #ff9999 !important;
 }
 </style>
