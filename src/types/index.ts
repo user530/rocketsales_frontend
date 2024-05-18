@@ -1,8 +1,11 @@
+import { VNode } from 'vue';
+
 export interface IColumn {
     title: string;
-    dataIndex: string;
+    dataIndex?: string;
     key: string;
     fixed?: boolean;
+    customRender?: (...args: any[]) => VNode;
 }
 
 interface ILeadStatus {
@@ -14,7 +17,7 @@ interface ILeadResponsible {
     name: string;
 }
 
-interface ILeadContact {
+export interface ILeadContact {
     name: string;
     phone?: string;
     email?: string;
