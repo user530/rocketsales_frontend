@@ -18,6 +18,7 @@ export default defineComponent({
         const leadsData = ref<(ILead & { key: number })[]>([]);
         const loading = ref(false);
         const abortController = ref<AbortController | null>(null);
+        const requestTracker = ref(0);
 
         // Columns setup
         const columns: TableColumnType<ILead>[] = [
@@ -58,6 +59,9 @@ export default defineComponent({
             // Setup new controller
             abortController.value = new AbortController();
 
+            // Increment request counter and save the id
+            const requestId = ++requestTracker.value;
+
             // Fetch block
             try {
                 // Raise loading flag
@@ -68,14 +72,21 @@ export default defineComponent({
 
                 // Validate?
 
-                // Set data
-                leadsData.value = data.map((val, ind) => ({ ...val, key: ind }));
+                // Check that request is a latest one
+                if (requestId === requestTracker.value) {
+
+                    // If it is -> set data
+                    leadsData.value = data.map((val, ind) => ({ ...val, key: ind }));
+                }
             } catch (error) {
                 // Log error, but don't throw it
                 console.error('Leads fetch failed!', (error as Error).message);
             } finally {
-                // Loading flag reset
-                loading.value = false;
+                // Check that request is a latest one
+                if (requestId === requestTracker.value) {
+                    // If it is reset loading flag
+                    loading.value = false;
+                }
             }
         };
 
