@@ -1,9 +1,9 @@
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, onMounted, reactive, ref } from 'vue';
 import { ILead } from '../types';
 import ContactsTable from './ContactsTable.vue';
 import SearchBar from './SearchBar.vue';
-import { charToColor, unixTimeToString, fetchData, validateLeadsResponse } from '../utils';
+import { charToColor, unixTimeToString, fetchData, validateLeadsResponse, generateFilters } from '../utils';
 import type { TableColumnType } from 'ant-design-vue/es';
 import { UserOutlined } from '@ant-design/icons-vue';
 
@@ -20,35 +20,61 @@ export default defineComponent({
         const abortController = ref<AbortController | null>(null);
         const requestTracker = ref(0);
 
+        // Update column filters 
+        const updateColumnsFilters = (data: unknown[]) => {
+            // Iterate over all columns
+            columns.forEach(
+                column => {
+                    // Skip if no filters on column
+                    if (!column.filters) return;
+                    // Update filters if it supposed to get filtered
+                    column.filters = generateFilters(data, `${column.dataIndex}`);
+                }
+            );
+        }
+
         // Columns setup
-        const columns: TableColumnType<ILead>[] = [
+        const columns: TableColumnType<ILead>[] = reactive([
             {
                 title: 'Название',
                 dataIndex: 'name',
                 key: 'name',
                 fixed: true,
+                sorter: (a, b) => a.name.localeCompare(b.name),
+                filters: generateFilters(leadsData.value, 'name'),
+                onFilter: (value, record) => record.name.includes(`${value}`),
             },
             {
                 title: 'Бюджет',
                 dataIndex: 'price',
-                key: 'price'
+                key: 'price',
+                sorter: (a, b) => a.price - b.price,
+                filters: generateFilters(leadsData.value, 'price'),
+                onFilter: (value, record) => record.price === +value,
             },
             {
                 title: 'Статус',
-                dataIndex: 'status',
-                key: 'status'
+                dataIndex: 'status.name',
+                key: 'status',
+                sorter: (a, b) => a.status.name.localeCompare(b.status.name),
+                filters: generateFilters(leadsData.value, 'status.name'),
+                onFilter: (value, record) => record.status.name.includes(`${value}`),
             },
             {
                 title: 'Ответственный',
-                dataIndex: 'responsible',
-                key: 'responsible'
+                dataIndex: 'responsible.name',
+                key: 'responsible',
+                sorter: (a, b) => a.responsible.name.localeCompare(b.responsible.name),
+                filters: generateFilters(leadsData.value, 'responsible.name'),
+                onFilter: (value, record) => record.responsible.name.includes(`${value}`),
             },
             {
                 title: 'Дата создания',
-                dataIndex: '',
-                key: 'created_at'
+                dataIndex: 'created_at',
+                key: 'created_at',
+                sorter: (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
             },
-        ];
+        ]);
 
         // Data fetch implementation for this component
         const fetchLeads = async (query = '') => {
@@ -77,9 +103,11 @@ export default defineComponent({
 
                 // Check that request is a latest one
                 if (requestId === requestTracker.value) {
-
                     // If it is -> set data
                     leadsData.value = data.map((val, ind) => ({ ...val, key: ind }));
+
+                    // Update filters, based on new values
+                    updateColumnsFilters(leadsData.value);
                 }
             } catch (error) {
                 // Log error, but don't throw it
