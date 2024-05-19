@@ -1,5 +1,6 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import debounce from 'lodash.debounce';
 
 export default defineComponent({
     name: 'SearchBar',
@@ -7,10 +8,16 @@ export default defineComponent({
     setup(_, { emit }) {
         const inputValue = ref('');
 
+        // Debounce the emit by 300 ms (recommended value)
+        const debouncedEmit = debounce(
+            (query: string) => { emit('searhLeads', query); },
+            300
+        );
+
         const inputHandler = (e: Event) => {
             if (!e.target) return;
             inputValue.value = (e.target as HTMLInputElement).value;
-            emit('searhLeads', inputValue.value);
+            debouncedEmit(inputValue.value);
         };
 
         return {
