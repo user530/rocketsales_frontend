@@ -22,5 +22,5 @@ export default defineComponent({
 </script>
 
 <template>
-    <a-input-search v-model="inputValue" @input="inputHandler" placeholder="Search" />
+    <a-input-search v-model="inputValue" @input="inputHandler" placeholder="Search" style="width: 200px" />
 </template>

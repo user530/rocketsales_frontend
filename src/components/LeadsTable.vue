@@ -1,9 +1,9 @@
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, onMounted, ref } from 'vue';
 import { ILead } from '../types';
 import ContactsTable from './ContactsTable.vue';
 import SearchBar from './SearchBar.vue';
-import { charToColor, unixTimeToString } from '../utils';
+import { charToColor, unixTimeToString, fetchData } from '../utils';
 import type { TableColumnType } from 'ant-design-vue/es';
 import { UserOutlined } from '@ant-design/icons-vue';
 
@@ -17,275 +17,9 @@ export default defineComponent({
     setup() {
         const leadsData = ref<(ILead & { key: number })[]>([]);
         const loading = ref(false);
+        const abortController = ref<AbortController | null>(null);
 
-        // Placeholder data
-        leadsData.value = [
-            {
-                "name": "Сделка№1",
-                "price": 100,
-                "created_at": 1715775952,
-                "status": {
-                    "name": "Переговоры",
-                    "color": "#ffff99"
-                },
-                "responsible": {
-                    "name": "Magomed"
-                },
-                "contacts": [
-                    {
-                        "name": "Василий Пупкин",
-                        "phone": "Телефон1",
-                        "email": "Почта1",
-                        "position": "Должность1"
-                    },
-                    {
-                        "name": "Пётр",
-                        "phone": "Телефон5",
-                        "email": "Почта5"
-                    }
-                ]
-            },
-            {
-                "name": "Сделка3",
-                "price": 300,
-                "created_at": 1715776192,
-                "status": {
-                    "name": "Первичный контакт",
-                    "color": "#99ccff"
-                },
-                "responsible": {
-                    "name": "Magomed"
-                },
-                "contacts": [
-                    {
-                        "name": "Василий Пупкин",
-                        "phone": "Телефон1",
-                        "email": "Почта1",
-                        "position": "Должность1"
-                    }
-                ]
-            },
-            {
-                "name": "Сделка5",
-                "price": 500,
-                "created_at": 1715776345,
-                "status": {
-                    "name": "Принимают решение",
-                    "color": "#ffcc66"
-                },
-                "responsible": {
-                    "name": "Magomed"
-                },
-                "contacts": []
-            },
-            {
-                "name": "Сделка9",
-                "price": 900,
-                "created_at": 1715776511,
-                "status": {
-                    "name": "Переговоры",
-                    "color": "#ffff99"
-                },
-                "responsible": {
-                    "name": "Magomed"
-                },
-                "contacts": [
-                    {
-                        "name": "Василий Пупкин",
-                        "phone": "Телефон1",
-                        "email": "Почта1",
-                        "position": "Должность1"
-                    }
-                ]
-            },
-            {
-                "name": "Номер2",
-                "price": 200,
-                "created_at": 1715776154,
-                "status": {
-                    "name": "Первичный контакт",
-                    "color": "#99ccff"
-                },
-                "responsible": {
-                    "name": "Magomed"
-                },
-                "contacts": [
-                    {
-                        "name": "Пелагея Шувалова",
-                        "phone": "Телефон2",
-                        "position": "Должность2"
-                    }
-                ]
-            },
-            {
-                "name": "Сделка6",
-                "price": 600,
-                "created_at": 1715776413,
-                "status": {
-                    "name": "Первичный контакт",
-                    "color": "#99ccff"
-                },
-                "responsible": {
-                    "name": "Magomed"
-                },
-                "contacts": []
-            },
-            {
-                "name": "Сделка7",
-                "price": 700,
-                "created_at": 1715776446,
-                "status": {
-                    "name": "Переговоры",
-                    "color": "#ffff99"
-                },
-                "responsible": {
-                    "name": "Magomed"
-                },
-                "contacts": [
-                    {
-                        "name": "Яков Королёв",
-                        "phone": "Телефон4",
-                        "email": "Почта4"
-                    }
-                ]
-            },
-            {
-                "name": "Сделка8",
-                "price": 800,
-                "created_at": 1715776484,
-                "status": {
-                    "name": "Принимают решение",
-                    "color": "#ffcc66"
-                },
-                "responsible": {
-                    "name": "Magomed"
-                },
-                "contacts": [
-                    {
-                        "name": "Светлана Камалова"
-                    }
-                ]
-            },
-            {
-                "name": "Сделка4",
-                "price": 400,
-                "created_at": 1715776218,
-                "status": {
-                    "name": "Согласование договора",
-                    "color": "#ffcccc"
-                },
-                "responsible": {
-                    "name": "Magomed"
-                },
-                "contacts": [
-                    {
-                        "name": "Марьяна Кайназарова",
-                        "phone": "Телефон4",
-                        "email": "Почта4"
-                    },
-                    {
-                        "name": "Василий Пупкин",
-                        "phone": "Телефон1",
-                        "email": "Почта1",
-                        "position": "Должность1"
-                    },
-                    {
-                        "name": "Пётр",
-                        "phone": "Телефон5",
-                        "email": "Почта5"
-                    }
-                ]
-            },
-            {
-                "name": "Сделка10",
-                "price": 1000,
-                "created_at": 1715776538,
-                "status": {
-                    "name": "Первичный контакт",
-                    "color": "#99ccff"
-                },
-                "responsible": {
-                    "name": "Magomed"
-                },
-                "contacts": [
-                    {
-                        "name": "Михаил Калашников",
-                        "email": "Почта2",
-                        "position": "Должность3"
-                    }
-                ]
-            },
-            {
-                "name": "Тестовая21",
-                "price": 250,
-                "created_at": 1715959844,
-                "status": {
-                    "name": "Первичный контакт",
-                    "color": "#99ccff"
-                },
-                "responsible": {
-                    "name": "Magomed"
-                },
-                "contacts": [
-                    {
-                        "name": "Павел",
-                        "email": "Почта21"
-                    }
-                ]
-            },
-            {
-                "name": "тестовая23",
-                "price": 300,
-                "created_at": 1715959932,
-                "status": {
-                    "name": "Переговоры",
-                    "color": "#ffff99"
-                },
-                "responsible": {
-                    "name": "Magomed"
-                },
-                "contacts": [
-                    {
-                        "name": "Алёша Попович",
-                        "phone": "телефон23",
-                        "email": "почта23"
-                    }
-                ]
-            },
-            {
-                "name": "Тестова22",
-                "price": 0,
-                "created_at": 1715959874,
-                "status": {
-                    "name": "Принимают решение",
-                    "color": "#ffcc66"
-                },
-                "responsible": {
-                    "name": "Magomed"
-                },
-                "contacts": [
-                    {
-                        "name": "",
-                        "phone": "телефон22",
-                        "email": "почта22"
-                    }
-                ]
-            },
-            {
-                "name": "Сделка #2892909",
-                "price": 0,
-                "created_at": 1715959948,
-                "status": {
-                    "name": "Первичный контакт",
-                    "color": "#99ccff"
-                },
-                "responsible": {
-                    "name": "Magomed"
-                },
-                "contacts": []
-            }
-        ].map((val, ind) => ({ ...val, key: ind }));
-
+        // Columns setup
         const columns: TableColumnType<ILead>[] = [
             {
                 title: 'Название',
@@ -315,8 +49,45 @@ export default defineComponent({
             },
         ];
 
+        // Data fetch implementation for this component
+        const fetchLeads = async (query = '') => {
+            // Interrupt possible request
+            if (abortController.value)
+                abortController.value.abort();
+
+            // Setup new controller
+            abortController.value = new AbortController();
+
+            // Fetch block
+            try {
+                // Raise loading flag
+                loading.value = true;
+
+                // Fetch data
+                const data = await fetchData<ILead[]>('leads', { query }, abortController.value.signal);
+
+                // Validate?
+
+                // Set data
+                leadsData.value = data.map((val, ind) => ({ ...val, key: ind }));
+            } catch (error) {
+                // Log error, but don't throw it
+                console.error('Leads fetch failed!', (error as Error).message);
+            } finally {
+                // Loading flag reset
+                loading.value = false;
+            }
+        };
+
         // Search handler
-        const handleSearch = (searchValue: string) => { console.log('Search fired!', searchValue) };
+        const handleSearch = (searchValue: string) => {
+            fetchLeads(searchValue);
+        };
+
+        // Initial fetch
+        onMounted(
+            () => fetchLeads()
+        );
 
         return {
             columns,
@@ -332,10 +103,15 @@ export default defineComponent({
 
 <template>
     <a-card title="Пример тестового задания">
-        <SearchBar @searhLeads="handleSearch" />
+        <!-- Add search bar to the header part -->
+        <template #extra>
+            <SearchBar @searhLeads="handleSearch" />
+        </template>
+
+        <!-- Wrap the table in the spinner -->
         <a-spin :spinning="loading">
             <a-table :customHeaderRow="() => ({ class: 'custom-header' })" :columns="columns" :dataSource="leadsData"
-                expandRowByClick tableLayout="fixed" sticky>
+                expandRowByClick tableLayout="fixed" sticky :pagination=false>
                 <template #expandedRowRender="{ record }: { record: ILead }">
                     <ContactsTable :contacts="record.contacts" />
                 </template>
