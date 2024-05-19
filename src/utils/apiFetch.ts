@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import { IYupValiation } from '@/types';
 
 // Base api url
 const BASE_URL = process.env.VUE_APP_API_BASE_URL;
@@ -10,7 +11,8 @@ const CACHE_EXPIRATION = 1000 * 60 *
 export const fetchData = async<T>(
     endpoint: string,
     query: Record<string, string> = {},
-    abortSignal?: AbortSignal
+    abortSignal?: AbortSignal,
+    validatorFunction?: (data: unknown) => Promise<IYupValiation>,
 ): Promise<T> => {
     if (!BASE_URL)
         throw new Error('Missing environment variable for the API base url!');
@@ -44,6 +46,15 @@ export const fetchData = async<T>(
 
         // Fetch the data
         const response = await axios<T>(reqConfig);
+
+        // Validate API response (if specified)
+        const validation: IYupValiation = validatorFunction
+            ? await validatorFunction(response)
+            : { valid: true, errors: null };
+
+        // Prevent invalid data
+        if (!validation.valid)
+            throw new Error('Failed to validate API response!');
 
         // Cache it
         localStorage.setItem(cacheKey, JSON.stringify(response.data));
