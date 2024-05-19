@@ -1,24 +1,22 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 
-// Cache expiration time
-const BASE_URL = process.env.API_BASE_URL;
-const CACHE_EXPIRATION = parseInt(process.env.API_CACHE_EXPIRATION, 10) || 1000 * 120;
-
+// Base api url
+const BASE_URL = process.env.VUE_APP_API_BASE_URL;
+// Cache expiration time (from minutes to seconds)
+const CACHE_EXPIRATION = 1000 * 60 *
+    parseInt(process.env.VUE_APP_API_CACHE_EXP_MIN, 10)
+    || 0;
 
 export const fetchData = async<T>(
     endpoint: string,
     query: Record<string, string> = {},
     abortSignal?: AbortSignal
 ): Promise<T> => {
-    console.log(BASE_URL, CACHE_EXPIRATION);
-
     if (!BASE_URL)
         throw new Error('Missing environment variable for the API base url!');
 
     const queryString = new URLSearchParams(query).toString();
     const fullUrl = `${BASE_URL}/${endpoint}?${queryString}`;
-
-    console.log(queryString, fullUrl);
 
     // We use a simple format for the cache key
     const cacheKey = `${endpoint}_${queryString}`;
@@ -30,6 +28,7 @@ export const fetchData = async<T>(
     if (cachedData && cachedTime) {
         // Cthe expiration and if still valid - use the cached data
         const isExpired = Date.now() - (parseInt(cachedTime, 10) || 0) > CACHE_EXPIRATION;
+
         if (!isExpired)
             return JSON.parse(cachedData) as T;
     }
@@ -42,11 +41,9 @@ export const fetchData = async<T>(
             method: 'get',
             signal: abortSignal,
         };
-        console.log(reqConfig);
 
         // Fetch the data
         const response = await axios<T>(reqConfig);
-        console.log(response);
 
         // Cache it
         localStorage.setItem(cacheKey, JSON.stringify(response.data));
@@ -55,9 +52,7 @@ export const fetchData = async<T>(
         return response.data;
     } catch (error) {
         if (axios.isCancel(Error))
-            console.error('Request canceled!', (error as AxiosError).message);
-        else
-            console.error(error);
+            console.log('Request canceled');
         throw error;
     }
 }
