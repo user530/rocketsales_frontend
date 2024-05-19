@@ -3,7 +3,7 @@ import { defineComponent, onMounted, ref } from 'vue';
 import { ILead } from '../types';
 import ContactsTable from './ContactsTable.vue';
 import SearchBar from './SearchBar.vue';
-import { charToColor, unixTimeToString, fetchData } from '../utils';
+import { charToColor, unixTimeToString, fetchData, validateLeadsResponse } from '../utils';
 import type { TableColumnType } from 'ant-design-vue/es';
 import { UserOutlined } from '@ant-design/icons-vue';
 
@@ -68,9 +68,12 @@ export default defineComponent({
                 loading.value = true;
 
                 // Fetch data
-                const data = await fetchData<ILead[]>('leads', { query }, abortController.value.signal);
-
-                // Validate?
+                const data = await fetchData<ILead[]>(
+                    'leads',
+                    { query },
+                    abortController.value.signal,
+                    validateLeadsResponse,
+                );
 
                 // Check that request is a latest one
                 if (requestId === requestTracker.value) {
