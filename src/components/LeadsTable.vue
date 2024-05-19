@@ -2,6 +2,7 @@
 import { defineComponent, ref } from 'vue';
 import { ILead } from '../types';
 import ContactsTable from './ContactsTable.vue';
+import SearchBar from './SearchBar.vue';
 import { charToColor, unixTimeToString } from '../utils';
 import type { TableColumnType } from 'ant-design-vue/es';
 import { UserOutlined } from '@ant-design/icons-vue';
@@ -11,6 +12,7 @@ export default defineComponent({
     components: {
         ContactsTable,
         UserOutlined,
+        SearchBar,
     },
     setup() {
         const leadsData = ref<(ILead & { key: number })[]>([]);
@@ -313,12 +315,16 @@ export default defineComponent({
             },
         ];
 
+        // Search handler
+        const handleSearch = (searchValue: string) => { console.log('Search fired!', searchValue) };
+
         return {
             columns,
             loading,
             leadsData,
             charToColor,
             unixTimeToString,
+            handleSearch,
         };
     }
 });
@@ -326,6 +332,7 @@ export default defineComponent({
 
 <template>
     <a-card title="Пример тестового задания">
+        <SearchBar @searhLeads="handleSearch" />
         <a-spin :spinning="loading">
             <a-table :customHeaderRow="() => ({ class: 'custom-header' })" :columns="columns" :dataSource="leadsData"
                 expandRowByClick tableLayout="fixed" sticky>
@@ -361,11 +368,11 @@ export default defineComponent({
 </template>
 
 <style scoped>
-:deep .custom-tag-text-color {
+:deep(.custom-tag-text-color) {
     color: #666 !important;
 }
 
-:deep .custom-header th {
-    background-color: #ff9999 !important;
+:deep(.custom-header) th {
+    background-color: #ffafaf !important;
 }
 </style>

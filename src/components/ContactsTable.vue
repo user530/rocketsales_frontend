@@ -91,11 +91,11 @@ export default defineComponent({
 </template>
 
 <style scoped>
-:deep .custom-darker-row td {
+:deep(.custom-darker-row) td {
     background-color: #fafafa;
 }
 
-:deep .custom-darker-row:hover td {
+:deep(.custom-darker-row:hover) td {
     background-color: #efefef !important;
 }
 </style>
