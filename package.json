@@ -12,7 +12,8 @@
     "axios": "^1.6.8",
     "core-js": "^3.8.3",
     "lodash.debounce": "^4.0.8",
-    "vue": "^3.2.13"
+    "vue": "^3.2.13",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@types/lodash.debounce": "^4.0.9",
