@@ -29,5 +29,5 @@ export default defineComponent({
 </script>
 
 <template>
-    <a-input-search v-model="inputValue" @input="inputHandler" placeholder="Search" style="width: 200px" />
+    <a-input-search v-model="inputValue" @input="inputHandler" placeholder="Найти..." style="width: 200px" />
 </template>
